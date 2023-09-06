@@ -1,4 +1,4 @@
-import React, { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect } from "react";
 import Buttons from "../assets/components/Buttons/buttons";
 import InputTarefa from "../assets/components/Inputs/input";
 import Tarefa from "../types/Tarefa";
@@ -85,7 +85,21 @@ function Home() {
         marcarComoConcluida={marcarComoConcluida}
       />
       <h2>Tarefas Concluídas</h2>
-      <Lista tarefas={tarefasConcluidas} action={() => {}} />
+      <Lista
+        tarefas={tarefasConcluidas}
+        action={() => {}}
+        tarefaEditando={null}
+        novoValor={""}
+        setNovoValor={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+        salvarEdicao={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+        marcarComoConcluida={function (): void {
+          throw new Error("Function not implemented.");
+        }}
+      />
     </>
   );
 }
