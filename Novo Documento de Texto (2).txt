@@ -1,0 +1,279 @@
+Claro, vou guiá-lo através da implementação passo a passo, seguindo as instruções que você forneceu. Vamos criar os diferentes componentes e hooks conforme as diretrizes.
+
+1. Importações e Tipos:
+Comece importando as bibliotecas necessárias e definindo os tipos relevantes.
+
+tsx
+Copy code
+import React, { useState, useEffect, useRef, useCallback, useMemo } from 'react';
+
+interface Task {
+  id: number;
+  text: string;
+  completed: boolean;
+  createdAt: number;
+}
+
+interface TaskFormProps {
+  addTask: (text: string) => void;
+}
+
+interface TaskItemProps {
+  task: Task;
+  toggleTask: (id: number) => void;
+  removeTask: (id: number) => void;
+}
+
+interface AppProps {
+  initialTasks: Task[];
+}
+
+// Resto do código...
+2. Componente de Formulário para Adicionar Tarefas:
+
+tsx
+Copy code
+const TaskForm: React.FC<TaskFormProps> = ({ addTask }) => {
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const handleAddTask = () => {
+    if (inputRef.current && inputRef.current.value.trim() !== '') {
+      addTask(inputRef.current.value.trim());
+      inputRef.current.value = '';
+    }
+  };
+
+  return (
+    <div>
+      <input ref={inputRef} type="text" placeholder="Nova tarefa" />
+      <button onClick={handleAddTask}>Adicionar</button>
+    </div>
+  );
+};
+3. Componente de Item de Tarefa:
+
+tsx
+Copy code
+const TaskItem: React.FC<TaskItemProps> = ({ task, toggleTask, removeTask }) => {
+  const handleToggle = () => {
+    toggleTask(task.id);
+  };
+
+  const handleRemove = () => {
+    removeTask(task.id);
+  };
+
+  return (
+    <div>
+      <input type="checkbox" checked={task.completed} onChange={handleToggle} />
+      <span>{task.text}</span>
+      <button onClick={handleRemove}>Remover</button>
+    </div>
+  );
+};
+4. Componente App:
+
+tsx
+Copy code
+const App: React.FC<AppProps> = ({ initialTasks }) => {
+  const [tasks, setTasks] = useState<Task[]>(initialTasks);
+  const [filter, setFilter] = useState<string>('all');
+
+  useEffect(() => {
+    // Carregar tarefas iniciais do localStorage
+    const storedTasks = JSON.parse(localStorage.getItem('tasks') || '[]');
+    setTasks(storedTasks);
+  }, []);
+
+  useEffect(() => {
+    // Atualizar localStorage sempre que tasks mudar
+    localStorage.setItem('tasks', JSON.stringify(tasks));
+  }, [tasks]);
+
+  const addTask = useCallback(
+    (text: string) => {
+      const newTask: Task = {
+        id: Date.now(),
+        text,
+        completed: false,
+        createdAt: Date.now(),
+      };
+      setTasks((prevTasks) => [...prevTasks, newTask]);
+    },
+    [setTasks]
+  );
+
+  const toggleTask = useCallback(
+    (id: number) => {
+      setTasks((prevTasks) =>
+        prevTasks.map((task) =>
+          task.id === id ? { ...task, completed: !task.completed } : task
+        )
+      );
+    },
+    [setTasks]
+  );
+
+  const removeTask = useCallback(
+    (id: number) => {
+      setTasks((prevTasks) => prevTasks.filter((task) => task.id !== id));
+    },
+    [setTasks]
+  );
+
+  const filteredTasks = useMemo(() => {
+    if (filter === 'completed') {
+      return tasks.filter((task) => task.completed);
+    } else if (filter === 'active') {
+      return tasks.filter((task) => !task.completed);
+    } else {
+      return tasks;
+    }
+  }, [tasks, filter]);
+
+  return (
+    <div>
+      <h1>Gerenciador de Tarefas</h1>
+      <TaskForm addTask={addTask} />
+      <div>
+        <button onClick={() => setFilter('all')}>Todas</button>
+        <button onClick={() => setFilter('active')}>Ativas</button>
+        <button onClick={() => setFilter('completed')}>Concluídas</button>
+      </div>
+      <div>
+        {filteredTasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            toggleTask={toggleTask}
+            removeTask={removeTask}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+
+export default App;
+Lembrando que você precisa envolver o componente App com o React.StrictMode e renderizá-lo em seu arquivo principal, como você faria com um aplicativo React comum.
+
+Este é um esqueleto básico que segue as diretrizes que você forneceu. Claro, dependendo dos requisitos específicos e da aparência desejada, você pode estilizar e aprimorar o aplicativo ainda mais.
+
+
+
+
+User
+faca estilizado ja e quando concluida altere a  <span> para o efeito da tag html <s>
+ChatGPT
+Claro, aqui está o código atualizado com estilização e com a alteração da <span> para a tag <s> quando a tarefa estiver concluída:
+
+1. Estilização:
+Vamos adicionar algum CSS básico para estilizar o aplicativo.
+
+css
+Copy code
+/* styles.css */
+body {
+  font-family: Arial, sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f5f5f5;
+}
+
+.container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+h1 {
+  font-size: 24px;
+  margin-bottom: 20px;
+}
+
+.task-list {
+  margin-top: 20px;
+}
+
+.task {
+  display: flex;
+  align-items: center;
+  margin-bottom: 10px;
+  padding: 10px;
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.task input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.task.completed {
+  background-color: #f2f2f2;
+}
+
+.task.completed s {
+  color: #999;
+}
+2. Atualização do Componente TaskItem:
+Aqui está o componente TaskItem atualizado para incluir estilos e a marcação <s> para tarefas concluídas.
+
+tsx
+Copy code
+const TaskItem: React.FC<TaskItemProps> = ({ task, toggleTask, removeTask }) => {
+  const handleToggle = () => {
+    toggleTask(task.id);
+  };
+
+  const handleRemove = () => {
+    removeTask(task.id);
+  };
+
+  return (
+    <div className={`task ${task.completed ? 'completed' : ''}`}>
+      <input type="checkbox" checked={task.completed} onChange={handleToggle} />
+      {task.completed ? <s>{task.text}</s> : <span>{task.text}</span>}
+      <button onClick={handleRemove}>Remover</button>
+    </div>
+  );
+};
+3. Atualização do Componente App:
+Adicione uma classe à div principal do aplicativo e inclua a lista de tarefas com a classe task-list.
+
+tsx
+Copy code
+const App: React.FC<AppProps> = ({ initialTasks }) => {
+  // Restante do código ...
+
+  return (
+    <div className="container">
+      <h1>Gerenciador de Tarefas</h1>
+      <TaskForm addTask={addTask} />
+      <div>
+        <button onClick={() => setFilter('all')}>Todas</button>
+        <button onClick={() => setFilter('active')}>Ativas</button>
+        <button onClick={() => setFilter('completed')}>Concluídas</button>
+      </div>
+      <div className="task-list">
+        {filteredTasks.map((task) => (
+          <TaskItem
+            key={task.id}
+            task={task}
+            toggleTask={toggleTask}
+            removeTask={removeTask}
+          />
+        ))}
+      </div>
+    </div>
+  );
+};
+Lembre-se de que você precisará incluir o arquivo CSS no arquivo principal (geralmente index.tsx) para aplicar as estilizações:
+
+tsx
+Copy code
+import './styles.css';
+Agora, o aplicativo exibirá tarefas concluídas com o efeito da tag <s> e estará estilizado de acordo com as classes CSS definidas. Certifique-se de ajustar as cores, estilos e layout conforme necessário para atender às suas preferências de design.
