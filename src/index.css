@@ -22,8 +22,17 @@ a {
 a:hover {
   color: #535bf2;
 }
-
+.card {
+  backdrop-filter: blur(16px) saturate(180%);
+  -webkit-backdrop-filter: blur(16px) saturate(180%);
+  background-color: rgba(22, 22, 22, 0.75);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.747);
+}
 body {
+  background-image: url("./assets/components/images/papel-de-parede-de-paisagem-magica-e-mistica-em-tons-de-roxo.jpg");
+  background-position: center;
+  background-size: contain;
   margin: 0;
   display: flex;
   place-items: center;
@@ -53,7 +62,7 @@ button:focus-visible {
 
 @media (prefers-color-scheme: light) {
   :root {
-    color: #213547;
+    color: #ffffff;
     background-color: #ffffff;
   }
   a:hover {

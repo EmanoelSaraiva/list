@@ -70,7 +70,7 @@ function Home() {
   };
 
   return (
-    <>
+    <div className="card">
       <h1>Lista de Tarefas</h1>
       <InputTarefa inputRef={inputRef} />
       <Buttons titulo="Adicionar" action={handleClick} />
@@ -100,7 +100,7 @@ function Home() {
           throw new Error("Function not implemented.");
         }}
       />
-    </>
+    </div>
   );
 }
 
